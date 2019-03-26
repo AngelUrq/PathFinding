@@ -6,8 +6,15 @@ import pickle
 # Definition class node
 class Node:
 
-    def __init__(self, coordinates):
+    def __init__(self, coordinates, neighbors):
         self.coordinates = coordinates
+        
+        self.neighbors = neighbors
+        
+        self.f = 0
+        self.g = 0
+        self.h = 0
+
         self.cameFrom = None
 
 def load_data():
@@ -22,7 +29,13 @@ def initialize(G, pos, start, goal):
     color_map = []
     node_size = []
 
+    list_nodes = []
+
     for node in G:
+        neighbors = get_neighbors(node, list(G.edges))
+
+        list_nodes.append(Node(node,neighbors))
+
         # start node
         if node == start:
             color_map.append('green')
@@ -49,11 +62,18 @@ def initialize(G, pos, start, goal):
 #     return h
 
 
-# def getNeighbors():
-#     return "list of neighors"
-
-
-def searchPath(G):
+def get_neighbors(node, edges):
+    neighbors = []
+    
+    for edge in edges:
+        if(node in edge):
+            for relationed_node in edge:
+                if(relationed_node != node):
+                    neighbors.append(relationed_node)
+            
+    return neighbors
+        
+def search_path(G):
     openSet = []
     closedSet = []
 
