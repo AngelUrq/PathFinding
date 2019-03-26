@@ -21,13 +21,14 @@ def initialize(G, pos, start, goal):
     # define start and goal nodes
     color_map = []
     node_size = []
-    for node in enumerate(G):
+
+    for node in G:
         # start node
-        if node[1] == start:
+        if node == start:
             color_map.append('green')
             node_size.append(200)
         # end node
-        elif node[1] == goal:
+        elif node == goal:
             color_map.append('blue')
             node_size.append(200)
         # all others
@@ -55,10 +56,6 @@ def initialize(G, pos, start, goal):
 def searchPath(G):
     openSet = []
     closedSet = []
-
-    
-
-
 
 
 # def plotPath(G, path):
