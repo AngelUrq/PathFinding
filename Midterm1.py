@@ -3,13 +3,20 @@ import matplotlib.pylab as plt
 import numpy as np
 import pickle
 
-def loadData():
+class Node:
+
+    def __init__(self, coordinates):
+        self.coordinates = coordinates
+
+def load_data():
     # load graph information
     pickle_in = open("Midterm1.pickle","rb")
     data = pickle.load(pickle_in)
     return data[0], data[2]
 
 def initialize(G, pos, start, goal):
+    for n in G:
+        print(type(n))
     # define start and goal nodes
     color_map = []
     node_size = []
@@ -54,7 +61,7 @@ def searchPath(G):
 
 
 def main():
-    G, pos = loadData()
+    G, pos = load_data()
     start_node = (2,19)
     goal_node = (17,0)
     initialize(G, pos, start_node, goal_node)
