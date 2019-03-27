@@ -2,6 +2,7 @@ import networkx as nx
 import matplotlib.pylab as plt
 import numpy as np
 import pickle
+import time
 
 # Definition class node
 class Node:
@@ -20,7 +21,6 @@ class Node:
 # global attributes
 list_nodes = []
 path_list = []
-path_list_coordinates = []
 start_node = None
 goal_node = None
 
@@ -31,7 +31,6 @@ def load_data():
     return data[0], data[2]
 
 def initialize(G, pos, start, goal):
-
     # define start and goal nodes
     color_map = []
     node_size = []
@@ -46,15 +45,21 @@ def initialize(G, pos, start, goal):
         # save in this list
         list_nodes.append(Node(node,neighbors))
 
+    start_time = time.time()
+
     # get list of nodes of the search
     path_list, cost = search_path(G,start_node,goal_node)
+
+    end_time = time.time()
+
+    print("Elapsed time: " + str(end_time-start_time))
+
     path_list_coordinates = []
 
     # get coordinates of nodes of the path_list
     if(path_list):   
         path_list_coordinates = get_coordinates(path_list)
-
-    
+  
     for node in G:
         # start node
         if node == start:
@@ -66,11 +71,11 @@ def initialize(G, pos, start, goal):
             node_size.append(200)
         # path nodes
         elif node in path_list_coordinates:
-            color_map.append('orange')
+            color_map.append('purple')
             node_size.append(50)
         # all others
         else:
-            color_map.append('red')
+            color_map.append('orange')
             node_size.append(50)
 
     plt.title("Total cost: " + str(cost))
@@ -81,10 +86,7 @@ def initialize(G, pos, start, goal):
     plt.show()
 
 def heuristic(a,b):
-    #return 0
-    return abs(a[0]-b[0]) + abs(a[1]-b[1])
-    #return np.sqrt((a[0]+b[0])**2+(a[1]+b[1]**2))
-
+    return (abs(a[0]-b[0]) + abs(a[1]-b[1]))*1
 
 def get_neighbors(node, edges):
     # get all neighbors of node, avoiding the neighbor above
@@ -112,7 +114,6 @@ def select_min_f(list_nodes):
 def reconstruct_path(node):
     # get path from where came the node
     path = []
-    l = list_nodes 
     cost = node.g
 
     while node != None:
@@ -172,13 +173,11 @@ def get_coordinates(list_nodes_path):
     
     return coordinates_path
 
-
 def main():
     G, pos = load_data()
-    start = (2,10)
-    goal = (19,15)
+    start = (2,19)
+    goal = (17,0)
     initialize(G, pos, start, goal)
-
 
 # when you call the script, it will start here
 if __name__ == "__main__":
