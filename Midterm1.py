@@ -89,28 +89,15 @@ def select_min_f(list_nodes):
         
         
 def reconstruct_path(node):
-    i = 1
+    path = []
+
     while node != None:
-        if(node.cameFrom != None):
-            x2 = node.coordinates[0]
-            y2 = node.coordinates[1]
-
-            x1 = node.cameFrom.coordinates[0]
-            y1 = node.cameFrom.coordinates[1]
-
-            if(x1 - x2 < 0):
-                print(str(i) + ". Derecha")
-            elif(x1 - x2 > 0):
-                print(str(i) + ". Izquierda")
-
-            if(y1 - y2 < 0):
-                print(str(i) + ". Arriba")
-            elif(y1 - y2 > 0):
-                print(str(i) + ". Abajo") 
-
-            i = i + 1  
-
+        path.append(node)
         node = node.cameFrom
+
+    path.reverse()
+    
+    return path
 
 def find_index_neighbor_in_list(neighbor):
     for i in range(len(list_nodes)):
