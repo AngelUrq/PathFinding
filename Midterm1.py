@@ -17,7 +17,10 @@ class Node:
 
         self.cameFrom = None
 
+# global attribute 
 list_nodes = []
+path_list = []
+path_list_coordinates = []
 start_node = None
 goal_node = None
 
@@ -33,14 +36,26 @@ def initialize(G, pos, start, goal):
     color_map = []
     node_size = []
 
+    # save star and goal in class node
     start_node = Node(start, get_neighbors(start, list(G.edges)))
     goal_node = Node(goal, get_neighbors(goal, list(G.edges)))
 
     for node in G:
+        # get all neighbors of each node
         neighbors = get_neighbors(node, list(G.edges))
-
+        # save in this list
         list_nodes.append(Node(node,neighbors))
 
+    # get list of nodes of the search
+    path_list = search_path(G,start_node,goal_node)
+    path_list_coordinates = []
+
+    if(path_list):
+        # get coordinates of nodes of the path_list
+        path_list_coordinates = get_coordinates(path_list)
+
+    
+    for node in G:
         # start node
         if node == start:
             color_map.append('green')
@@ -49,13 +64,15 @@ def initialize(G, pos, start, goal):
         elif node == goal:
             color_map.append('blue')
             node_size.append(200)
+        # path nodes
+        elif node in path_list_coordinates:
+            color_map.append('orange')
+            node_size.append(50)
         # all others
         else:
             color_map.append('red')
             node_size.append(50)
 
-
-    search_path(G,start_node,goal_node)
 
     # plot graph
     nx.draw_networkx(G, pos=pos, with_labels=False, node_color=color_map, node_size=node_size)
@@ -64,21 +81,24 @@ def initialize(G, pos, start, goal):
     plt.show()
 
 def heuristic(a,b):
+    # distance between two nodes
     return np.sqrt((a[0]+b[0])**2+(a[1]+b[1]**2))
 
 
 def get_neighbors(node, edges):
+    # get all neighbors of node, avoiding the neighbor above
     neighbors = []
     
     for edge in edges:
         if(node in edge):
             for relationed_node in edge:
-                if(relationed_node != node):
+                if(relationed_node != node and relationed_node[1] <= node[1]):
                     neighbors.append(relationed_node)
             
     return neighbors
 
 def select_min_f(list_nodes):
+    # get min value of function of the list_nodes
     min_node = list_nodes[0]
 
     for node in list_nodes:
@@ -89,6 +109,7 @@ def select_min_f(list_nodes):
         
         
 def reconstruct_path(node):
+    # get path from where came the node
     path = []
 
     while node != None:
@@ -100,6 +121,7 @@ def reconstruct_path(node):
     return path
 
 def find_index_neighbor_in_list(neighbor):
+    # find index of the neighbor in the list of nodes, checking its coordinates
     for i in range(len(list_nodes)):
         if list_nodes[i].coordinates == neighbor:
             return i
@@ -114,9 +136,8 @@ def search_path(G, start_node, goal_node):
         current = select_min_f(openSet)
 
         if current.coordinates == goal_node.coordinates:
-            reconstruct_path(current)
-            break
-        
+            return reconstruct_path(current)
+            
         openSet.remove(current)
         closedSet.append(current)
 
@@ -136,24 +157,24 @@ def search_path(G, start_node, goal_node):
             list_nodes[i].cameFrom = current
             list_nodes[i].g = tentative_g
             list_nodes[i].f = list_nodes[i].g + heuristic(list_nodes[i].coordinates, goal_node.coordinates)
-    
 
-# def plotPath(G, path):
-#     nx.draw("show the path within the graph")
-#     print path
+    print "Ninguna solucion encontrada"
+    return None
+
+def get_coordinates(list_nodes_path):
+    coordinates_path = []
+
+    for node in list_nodes_path:
+        coordinates_path.append(node.coordinates)
+    
+    return coordinates_path
 
 
 def main():
     G, pos = load_data()
     start = (2,19)
-    goal = (17,0)
+    goal = (4,2)
     initialize(G, pos, start, goal)
-
-
-    ''' you have to develop the rest of the functions '''
-    # searchPath()
-
-    # plotPath()
 
 
 # when you call the script, it will start here
