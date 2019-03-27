@@ -17,7 +17,7 @@ class Node:
 
         self.cameFrom = None
 
-# global attribute 
+# global attributes
 list_nodes = []
 path_list = []
 path_list_coordinates = []
@@ -36,7 +36,7 @@ def initialize(G, pos, start, goal):
     color_map = []
     node_size = []
 
-    # save star and goal in class node
+    # save start and goal in class node
     start_node = Node(start, get_neighbors(start, list(G.edges)))
     goal_node = Node(goal, get_neighbors(goal, list(G.edges)))
 
@@ -47,11 +47,11 @@ def initialize(G, pos, start, goal):
         list_nodes.append(Node(node,neighbors))
 
     # get list of nodes of the search
-    path_list = search_path(G,start_node,goal_node)
+    path_list, cost = search_path(G,start_node,goal_node)
     path_list_coordinates = []
 
-    if(path_list):
-        # get coordinates of nodes of the path_list
+    # get coordinates of nodes of the path_list
+    if(path_list):   
         path_list_coordinates = get_coordinates(path_list)
 
     
@@ -73,7 +73,7 @@ def initialize(G, pos, start, goal):
             color_map.append('red')
             node_size.append(50)
 
-
+    plt.title("Total cost: " + str(cost))
     # plot graph
     nx.draw_networkx(G, pos=pos, with_labels=False, node_color=color_map, node_size=node_size)
     plt.xticks(np.arange(0, 20))
@@ -81,8 +81,9 @@ def initialize(G, pos, start, goal):
     plt.show()
 
 def heuristic(a,b):
-    # distance between two nodes
-    return np.sqrt((a[0]+b[0])**2+(a[1]+b[1]**2))
+    #return 0
+    return abs(a[0]-b[0]) + abs(a[1]-b[1])
+    #return np.sqrt((a[0]+b[0])**2+(a[1]+b[1]**2))
 
 
 def get_neighbors(node, edges):
@@ -111,6 +112,8 @@ def select_min_f(list_nodes):
 def reconstruct_path(node):
     # get path from where came the node
     path = []
+    l = list_nodes 
+    cost = node.g
 
     while node != None:
         path.append(node)
@@ -118,7 +121,7 @@ def reconstruct_path(node):
 
     path.reverse()
     
-    return path
+    return path, cost
 
 def find_index_neighbor_in_list(neighbor):
     # find index of the neighbor in the list of nodes, checking its coordinates
@@ -158,8 +161,8 @@ def search_path(G, start_node, goal_node):
             list_nodes[i].g = tentative_g
             list_nodes[i].f = list_nodes[i].g + heuristic(list_nodes[i].coordinates, goal_node.coordinates)
 
-    print "Ninguna solucion encontrada"
-    return None
+    print "No solution found"
+    return None, 0
 
 def get_coordinates(list_nodes_path):
     coordinates_path = []
@@ -172,8 +175,8 @@ def get_coordinates(list_nodes_path):
 
 def main():
     G, pos = load_data()
-    start = (2,19)
-    goal = (4,2)
+    start = (2,10)
+    goal = (19,15)
     initialize(G, pos, start, goal)
 
 
