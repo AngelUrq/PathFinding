@@ -89,10 +89,35 @@ def select_min_f(list_nodes):
         
         
 def reconstruct_path(node):
+    i = 1
     while node != None:
-        print(node)
+        if(node.cameFrom != None):
+            x2 = node.coordinates[0]
+            y2 = node.coordinates[1]
+
+            x1 = node.cameFrom.coordinates[0]
+            y1 = node.cameFrom.coordinates[1]
+
+            if(x1 - x2 < 0):
+                print(str(i) + ". Derecha")
+            elif(x1 - x2 > 0):
+                print(str(i) + ". Izquierda")
+
+            if(y1 - y2 < 0):
+                print(str(i) + ". Arriba")
+            elif(y1 - y2 > 0):
+                print(str(i) + ". Abajo") 
+
+            i = i + 1  
+
         node = node.cameFrom
 
+def find_index_neighbor_in_list(neighbor):
+    for i in range(len(list_nodes)):
+        if list_nodes[i].coordinates == neighbor:
+            return i
+
+    return -1
 
 def search_path(G, start_node, goal_node):
     openSet = [start_node]
@@ -100,7 +125,8 @@ def search_path(G, start_node, goal_node):
 
     while openSet:
         current = select_min_f(openSet)
-        if current == goal_node:
+
+        if current.coordinates == goal_node.coordinates:
             reconstruct_path(current)
             break
         
@@ -108,20 +134,21 @@ def search_path(G, start_node, goal_node):
         closedSet.append(current)
 
         for neighbor in current.neighbors:
-            if neighbor in closedSet:
-                continue
+            i = find_index_neighbor_in_list(neighbor)
             
+            if list_nodes[i] in closedSet:
+                continue
+                    
             tentative_g = current.g + 1
 
-            if neighbor not in openSet:
-                openSet.append(neighbor)
-            elif tentative_g >= neighbor.g:
+            if list_nodes[i] not in openSet:
+                openSet.append(list_nodes[i])
+            elif tentative_g >= list_nodes[i].g:
                 continue
-            
-            neighbor.cameFrom = current
-            neighbor.g = tentative_g
-            neighbor.f = neighbor.g + heuristic(neighbor, goal_node)
-
+                    
+            list_nodes[i].cameFrom = current
+            list_nodes[i].g = tentative_g
+            list_nodes[i].f = list_nodes[i].g + heuristic(list_nodes[i].coordinates, goal_node.coordinates)
     
 
 # def plotPath(G, path):
