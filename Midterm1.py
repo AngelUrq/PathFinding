@@ -14,82 +14,69 @@ class Node:
         
         self.f = 0
         self.g = 0
-        self.h = 0
 
         self.cameFrom = None
 
-# global attributes
 list_nodes = []
 path_list = []
 start_node = None
 goal_node = None
 
 def load_data():
-    # load graph information
     pickle_in = open("Midterm1.pickle","rb")
     data = pickle.load(pickle_in)
     return data[0], data[2]
 
 def initialize(G, pos, start, goal):
-    # define start and goal nodes
     color_map = []
     node_size = []
 
-    # save start and goal in class node
+    #Save start and goal in Node object
     start_node = Node(start, get_neighbors(start, list(G.edges)))
     goal_node = Node(goal, get_neighbors(goal, list(G.edges)))
 
     for node in G:
-        # get all neighbors of each node
         neighbors = get_neighbors(node, list(G.edges))
-        # save in this list
+        
         list_nodes.append(Node(node,neighbors))
 
-    start_time = time.time()
-
-    # get list of nodes of the search
+    #Get optimal path and cost
     path_list, cost = search_path(G,start_node,goal_node)
-
-    end_time = time.time()
-
-    print("Elapsed time: " + str(end_time-start_time))
-
     path_list_coordinates = []
 
-    # get coordinates of nodes of the path_list
+    #Get coordinates from Node objects
     if(path_list):   
         path_list_coordinates = get_coordinates(path_list)
+        plt.title("Total cost: " + str(cost))
+    else:
+        plt.title("No solution was found")
   
     for node in G:
-        # start node
         if node == start:
             color_map.append('green')
             node_size.append(200)
-        # end node
         elif node == goal:
             color_map.append('blue')
             node_size.append(200)
-        # path nodes
         elif node in path_list_coordinates:
             color_map.append('purple')
             node_size.append(50)
-        # all others
         else:
             color_map.append('orange')
             node_size.append(50)
 
-    plt.title("Total cost: " + str(cost))
     # plot graph
     nx.draw_networkx(G, pos=pos, with_labels=False, node_color=color_map, node_size=node_size)
     plt.xticks(np.arange(0, 20))
     plt.yticks(np.arange(0, 20))
     plt.show()
 
+#Manhattan distance between a and b
 def heuristic(a,b):
     return (abs(a[0]-b[0]) + abs(a[1]-b[1]))*1
 
+#Get all node neighbors, avoiding the neighbor from above
 def get_neighbors(node, edges):
-    # get all neighbors of node, avoiding the neighbor above
     neighbors = []
     
     for edge in edges:
@@ -100,8 +87,8 @@ def get_neighbors(node, edges):
             
     return neighbors
 
+#Get minimun value of f(n) from list_nodes
 def select_min_f(list_nodes):
-    # get min value of function of the list_nodes
     min_node = list_nodes[0]
 
     for node in list_nodes:
@@ -110,9 +97,9 @@ def select_min_f(list_nodes):
 
     return min_node
         
-        
+
+#Get optimal path and cost from where came the node    
 def reconstruct_path(node):
-    # get path from where came the node
     path = []
     cost = node.g
 
@@ -124,14 +111,15 @@ def reconstruct_path(node):
     
     return path, cost
 
+#Find index of the neighbor in the list of nodes, checking its coordinates
 def find_index_neighbor_in_list(neighbor):
-    # find index of the neighbor in the list of nodes, checking its coordinates
     for i in range(len(list_nodes)):
         if list_nodes[i].coordinates == neighbor:
             return i
 
     return -1
 
+#A* implementation
 def search_path(G, start_node, goal_node):
     openSet = [start_node]
     closedSet = []
@@ -141,11 +129,15 @@ def search_path(G, start_node, goal_node):
 
         if current.coordinates == goal_node.coordinates:
             return reconstruct_path(current)
-            
+
         openSet.remove(current)
         closedSet.append(current)
 
         for neighbor in current.neighbors:
+            #in order to modify original list_nodes, we need the index
+            #list_nodes[i] is the neighbor Node object in current.neighbors
+            #because current.neighbors are only coordinates
+
             i = find_index_neighbor_in_list(neighbor)
             
             if list_nodes[i] in closedSet:
@@ -179,6 +171,5 @@ def main():
     goal = (17,0)
     initialize(G, pos, start, goal)
 
-# when you call the script, it will start here
 if __name__ == "__main__":
     main()
